@@ -3,7 +3,9 @@ package com.token_service.Service;
 import com.token_service.Entities.Token;
 import com.token_service.Entities.UserMessage;
 import com.token_service.Repository.TokenRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -16,6 +18,9 @@ public class TokenService implements ITokenService {
     @Autowired
     private TokenRepository tokenRepository;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @Override
     public Token createToken(Long userId) {
         Token token = new Token();
@@ -27,6 +32,7 @@ public class TokenService implements ITokenService {
         UserMessage updatedUserMessage = new UserMessage();
         updatedUserMessage.setId(userId);
         updatedUserMessage.setToken(savedToken.getToken());
+        rabbitTemplate.convertAndSend("user.update.queue", updatedUserMessage);
 
         return savedToken;
     }
@@ -37,13 +43,24 @@ public class TokenService implements ITokenService {
         if (verifyToken.isPresent()) {
             Token theToken = verifyToken.get();
             if (theToken.getExpiryDate() >= System.currentTimeMillis()) {
-                tokenRepository.delete(theToken);
+                // Token is valid
                 return true;
             }
         }
         return false;
     }
 
+    public boolean confirmToken(String token) {
+        Optional<Token> verifyToken = tokenRepository.findByToken(token);
+        if (verifyToken.isPresent()) {
+            Token theToken = verifyToken.get();
+            if (theToken.getExpiryDate() >= System.currentTimeMillis()) {
+                tokenRepository.delete(theToken);
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public Token findTokenByToken(String token) {
@@ -67,7 +84,7 @@ public class TokenService implements ITokenService {
 
     private long calculateExpiryDate() {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.HOUR, 24); // Token valid for 24 hours
+        cal.add(Calendar.HOUR, 24);
         return cal.getTimeInMillis();
     }
 }
