@@ -1,5 +1,5 @@
 <div>
-    <h1>User Token Microservice</h1>
+    <h1>Token Microservice</h1>
 </div>
 
 ## About The Project
