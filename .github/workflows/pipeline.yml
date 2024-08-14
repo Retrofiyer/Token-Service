@@ -1,4 +1,4 @@
-name: Deploy Service to Azure AKS
+name: Upload Image Docker-Hub
 
 on:
   push:
@@ -23,23 +23,3 @@ jobs:
         run: |
           docker build ./ -f Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
-
-      - name: Set up Azure CLI
-        uses: azure/cli@v2
-        with:
-          inlineScript: |
-            az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-
-      - name: AKS login
-        run: az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
-
-      - name: Update Deployment in AKS
-        run: |
-          kubectl set image deployment/token-service-deployment token-service=${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
-
-      - name: Verify deployment
-        run: |
-          kubectl rollout status deployment/token-service-deployment
-          kubectl get services token-service
