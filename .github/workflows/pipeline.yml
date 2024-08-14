@@ -21,8 +21,8 @@ jobs:
 
       - name: Build and push Docker image to Docker Hub
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-microservice:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-microservice:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
 
       - name: Set up Azure CLI
         uses: azure/cli@v2
@@ -32,10 +32,11 @@ jobs:
 
       - name: Update Deployment in AKS
         run: |
-          kubectl set image deployment/my-microservice-deployment my-microservice=${{ secrets.DOCKERHUB_USERNAME }}/my-microservice:latest
+          kubectl set image deployment/token-service-deployment token-service=${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
+          kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
 
       - name: Verify deployment
         run: |
-          kubectl rollout status deployment/my-microservice-deployment
-          kubectl get services my-microservice-service
+          kubectl rollout status deployment/token-service-deployment
+          kubectl get services token-service
