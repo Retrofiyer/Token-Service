@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and push Docker image to Docker Hub
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
+          docker build ./ -f Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/token-service:latest
 
       - name: Set up Azure CLI
