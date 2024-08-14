@@ -4,5 +4,5 @@ RUN mvn clean package -DskipTests
 
 FROM amazoncorretto:17-alpine-jdk
 
-COPY --from=build /target/token-service-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /target/Token-Service-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT [ "java", "-jar","/app.jar" ]
