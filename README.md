@@ -1,5 +1,5 @@
 <div>
-    <h1>User Token Microservice</h1>
+    <h1>Token Microservice</h1>
 </div>
 
 ## About The Project
@@ -50,7 +50,6 @@ The Token Service is a RESTful API built using Spring Boot. This component is es
 
 ## Built With
 
-[![Java][java.com]][java-url]
 [![Spring Boot][springboot.com]][springboot-url]
 [![PostgreSQL][postgresql.com]][postgresql-url]
 [![RabbitMQ][rabbitmq.com]][rabbitmq-url]
